@@ -1,0 +1,16 @@
+{
+    "text": [
+        "<b>Ваш текущий контекст:</b>\n\n",
+        "{{context}}"
+    ],
+
+    "keyboard": {
+        "type": "inline",
+        "keys": [
+            [
+                {"text":"🔀 Сменить",
+                "callback_data": "change_context"}
+            ]
+        ]
+    }
+}
