@@ -1,5 +1,4 @@
 import logging
-import markdown
 
 from models import Promt, PromtRole
 import repositories
