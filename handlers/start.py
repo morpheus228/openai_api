@@ -14,3 +14,4 @@ async def start(message: Message, state: FSMContext):
     text, reply_markup = MessageTemplate.from_json('commands/start').render(**kwargs)
     await message.answer(text=text, reply_markup=reply_markup)
 
+

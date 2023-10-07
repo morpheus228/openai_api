@@ -1,3 +1,6 @@
+import logging
+import markdown
+
 from models import Promt, PromtRole
 import repositories
 from ..interfaces import OpenAI
@@ -10,20 +13,24 @@ class OpenAIService(OpenAI):
 
     async def make_request(self, user_id: int, text: str) -> str:
         promt = Promt(PromtRole.user, text)
-        # self.histories_repository.add(user_id, promt)
-
-        # promts = self.histories_repository.get(user_id)
-        promts = [promt]
+        self.histories_repository.add(user_id, promt)
+        promts = self.histories_repository.get(user_id)
+        logging.info(promts)
 
         try:
             response = await self.openai_repository.make_request(promts)
 
         except Exception as error:
-            response = str(error)
+            response = str(error) + " - error!"
 
         else:
             self.histories_repository.add(user_id, response)
             response = response.value
+            response = response.replace('*', '\\*')
+            response = response.replace('_', '\\_')
+            
+        logging.info(response + "\n")
+
 
         return response
         
@@ -44,14 +51,14 @@ class OpenAIService(OpenAI):
         else:
             history = [context] + history
 
-        self.update_history(history)
+        self.update_history(user_id, history)
 
     def delete_context(self, user_id: int):
         history = self.histories_repository.get(user_id)
 
         if self.check_context(history):
             history = history[1:]
-            self.update_history(history)
+            self.update_history(user_id, history)
 
     def clear_history(self, user_id: int):
         history = self.histories_repository.get(user_id)
@@ -61,7 +68,7 @@ class OpenAIService(OpenAI):
         else:
             history = []
         
-        self.update_history(history)
+        self.update_history(user_id, history)
 
     def clear_history_with_context(self, user_id: int):
         self.histories_repository.clear(user_id)
@@ -76,8 +83,10 @@ class OpenAIService(OpenAI):
         
         return True
     
-    def update_history(self, history: list[Promt]):
-        self.histories_repository.clear()
+    def update_history(self, user_id: int, history: list[Promt]):
+        self.histories_repository.clear(user_id)
 
         for promt in history:
-            self.histories_repository.add(promt)
+            self.histories_repository.add(user_id, promt)
+
+    

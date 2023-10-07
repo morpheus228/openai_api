@@ -14,24 +14,24 @@ router = Router()
 
 @router.message(F.text != None)
 async def request(message: Message, service: Service):
-    bot_message = await message.answer("<b>Посылаем запрос на сервера...</b>")
-    # task = asyncio.create_task(send_wait_messages(message))
+    bot_message = await message.answer("⌛ *Посылаем запрос на сервера...*")
+
+    task = asyncio.create_task(send_wait_messages(bot_message))
     response = await service.openai.make_request(message.from_user.id, message.text)
-    # print(response)
-    # task.cancel()
+    task.cancel()
+    
     await bot_message.edit_text(response)
 
 
 async def send_wait_messages(message: Message):
     texts = [
-        "<b>Сервера включают видеокарты...</b>",
-        "<b>Нейронные сети определяются с ответом...</b>",
-        "<b>Ждет ответа от серверов...</b>",
-        "<b>Обрабатываем ответ...</b>"
+        "⌛ *Сервера включают видеокарты...*",
+        "⌛ *Нейронные сети определяются с ответом...*",
+        "⌛ *Ждем ответ от серверов...*",
+        "⌛ *Обрабатываем ответ...*"
         ]
     
     while True:
-        print('ddffdf')
         for text in texts:
-            sleep(0.5)
+            await sleep(1)
             await message.edit_text(text)

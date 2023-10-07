@@ -1,3 +1,4 @@
+import logging
 import httpx
 import copy
 
@@ -7,6 +8,7 @@ from strenum import StrEnum
 from config import OpenAIConfig
 from errors import OpenAIRequestError, OpenAIRequestTimeoutError
 from models import Promt, PromtRole
+from utils.logging import log_time
 from ..interfaces import OpenAI
 
 
@@ -41,7 +43,7 @@ class OpenAIRepository(OpenAI):
         }
         
         self.model: str = config.model
-        self.timeout: float = 30
+        self.timeout: float = 120
     
     @staticmethod
     def encode_input(promts: list[Promt]) -> list[dict[str, str]]:
@@ -64,12 +66,14 @@ class OpenAIRepository(OpenAI):
             raise OpenAIRequestError(response.json())
         
         try:
+            logging.info(response.json())
             message = response.json()['choices'][0]['message']['content']
             return Promt(PromtRole.assistant, message)
         
         except Exception as err:
             raise OpenAIRequestError(str(err))
 
+    @log_time
     async def post(self, data: dict) -> httpx.Response:
         async with httpx.AsyncClient() as client:
             return await client.post(self.url, headers=self.headers, json=data, timeout=self.timeout)

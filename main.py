@@ -9,9 +9,10 @@ from aiogram.types import BotCommand
 
 from config import Config
 
-from handlers.commands import router as command_router
+from handlers.start import router as command_router
 from handlers.context import router as context_router
 from handlers.requests import router as requests_router
+from handlers.histories import router as histories_router
 
 from repositories.realizations import redis
 from repositories import Repository
@@ -24,6 +25,7 @@ logging.basicConfig(level=logging.INFO)
 def register_routers(dp: Dispatcher):
     dp.include_router(command_router)
     dp.include_router(context_router)
+    dp.include_router(histories_router)
     dp.include_router(requests_router)
 
 
@@ -47,7 +49,7 @@ async def register_default_commands(dp: Dispatcher):
 
 async def main():
     config = Config()
-    bot = Bot(config.bot.token, parse_mode='HTML')
+    bot = Bot(config.bot.token, parse_mode='Markdown')
 
     # mysql_engine = mysql.get_engine(config.mysql)
     redis_engine = redis.get(config.redis)
