@@ -12,29 +12,11 @@ services:
         - REDIS_PORT=${REDIS_PORT}
         - REDIS_DATABASES=16
         env_file: .env
-        
-#     mysql:
-#         image: mysql:latest
-#         ports:
-#             - 3305:3306
-#         environment:
-#             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#             MYSQL_DATABASE: ${MYSQL_DATABASE}
-#             MYSQL_USER: ${MYSQL_USER}
-#             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
-#         env_file: .env
-#         volumes:
-#             - anubis_mirror_bot_mysql:/var/lib/mysql/
+    bot:
+        build: .
+        depends_on:
+            - redis
+        env_file: .env
 
-    # bot:
-    #     build: .
-    #     depends_on:
-    #         - redis
-    #     env_file: .env
-
-
-# volumes:
-#     anubis_mirror_bot_mysql:
-#         external: true
 
